@@ -10,8 +10,6 @@ import org.openqa.selenium.support.ui.Select;
 
 public class ProdutoPage {
 	
-	private static final By botaoAddToCart = null;
-
 	private WebDriver driver;
 	
 	private By nomeProduto = By.className("h1");
@@ -24,7 +22,7 @@ public class ProdutoPage {
 	
 	private By quantidadeProduto = By.id("quantity_wanted");
 	
-	private By botaoAddCart = By.className("add-to-cart");
+	private By botaoAddToCart = By.className("add-to-cart");
 	
 	public ProdutoPage(WebDriver driver) {
 		this.driver = driver;
@@ -42,12 +40,12 @@ public class ProdutoPage {
 		encontrarDropdownSize().selectByVisibleText(opcao);
 	}
 	
-	public List<String> obterOpcoesSeleconadas(){
+	public List<String> obterOpcoesSelecionadas(){
 		List<WebElement> elementosSelecionados = 
 		encontrarDropdownSize().getAllSelectedOptions();
 		
-		List<String> listaOpcoesSelecionadas = new ArrayList();
-		for(WebElement elemento : elementosSelecionados) {
+		List<String> listaOpcoesSelecionadas = new ArrayList<String>();
+		for(WebElement elemento : elementosSelecionados ) {
 			listaOpcoesSelecionadas.add(elemento.getText());
 		}
 		return listaOpcoesSelecionadas;
@@ -66,10 +64,9 @@ public class ProdutoPage {
 		driver.findElement(quantidadeProduto).sendKeys(Integer.toString(quantidade));
 	}
 	
-	public ModalProdutoPage clicarBotaoaddToCart() {
-		driver.findElement(botaoAddCart).click();
+	public ModalProdutoPage clicarBotaoAddToCart() {
+		driver.findElement(botaoAddToCart).click();
 		return new ModalProdutoPage(driver);
+		
 	}
-	
-
 }
