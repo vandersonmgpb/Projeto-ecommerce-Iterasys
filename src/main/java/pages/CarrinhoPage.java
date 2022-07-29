@@ -89,4 +89,8 @@ private WebDriver driver;
 		driver.findElement(botaoProceedToCheckout).click();
 		return new CheckoutPage(driver);
 	}
+<<<<<<< HEAD
+=======
+
+>>>>>>> de43395c741d7848a1fdedba116b8bd03f324bf6
 }
