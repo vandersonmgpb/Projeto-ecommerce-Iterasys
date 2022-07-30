@@ -5,7 +5,7 @@ import org.openqa.selenium.WebDriver;
 
 public class CarrinhoPage {
 
-private WebDriver driver;
+	private WebDriver driver;
 	
 	private By nomeProduto = By.cssSelector("div.product-line-info a");
 	
@@ -89,8 +89,5 @@ private WebDriver driver;
 		driver.findElement(botaoProceedToCheckout).click();
 		return new CheckoutPage(driver);
 	}
-<<<<<<< HEAD
-=======
 
->>>>>>> de43395c741d7848a1fdedba116b8bd03f324bf6
 }

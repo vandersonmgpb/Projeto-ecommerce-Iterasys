@@ -36,7 +36,7 @@ public class ProdutoPage {
 		return driver.findElement(precoProduto).getText();
 	}
 	
-	public void selecionarOpcaoDropdown(String opcao) {
+	public void selecionarOpcaoDropDown(String opcao) {
 		encontrarDropdownSize().selectByVisibleText(opcao);
 	}
 	
