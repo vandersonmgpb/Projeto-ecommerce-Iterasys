@@ -20,6 +20,20 @@ public class BaseTests {
 	private static WebDriver driver;
 	protected HomePage homePage;
 	
+//		System.setProperty("WebDriver.geckodriver", "C:\\Users\\vande\\OneDrive\\Documentos\\teste selenium\\geckodriver-v0.31.0-win64\\geckodriver.exe");
+	@BeforeAll
+	public static void inicializar() {
+		driver = new FirefoxDriver();
+		driver.get("https://marcelodebittencourt.com/demoprestashop/");
+	}
+	
+	@BeforeEach //JUnit 5
+//	@Before // JUnit 4
+	public void carregarPaginaInicial() {
+		driver.get("https://marcelodebittencourt.com/demoprestashop/");
+		homePage = new HomePage(driver);
+	}
+	
 	public void capturarTela(String nomeTeste, String resultado) {
 		var camera = (TakesScreenshot) driver;
 		File capturaDeTela = camera.getScreenshotAs(OutputType.FILE);
@@ -28,19 +42,6 @@ public class BaseTests {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-	}
-	
-//		System.setProperty("WebDriver.geckodriver", "C:\\Users\\vande\\OneDrive\\Documentos\\teste selenium\\geckodriver-v0.31.0-win64\\geckodriver.exe");
-	@BeforeAll
-	public static void inicializar() {
-		driver = new FirefoxDriver();
-		driver.get("https://marcelodebittencourt.com/demoprestashop/");
-	}
-	
-	@BeforeEach
-	public void carregarPaginaInicial() {
-		driver.get("https://marcelodebittencourt.com/demoprestashop/");
-		homePage = new HomePage(driver);
 	}
 	
 	@AfterAll

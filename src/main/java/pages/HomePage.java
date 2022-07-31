@@ -25,7 +25,7 @@ public class HomePage {
 
 	private By usuarioLogado = By.cssSelector("#_desktop_user_info span.hidden-sm-down");
 	
-	private By botaosignOut = By.cssSelector("a.logout");
+	private By botaoSignOut = By.cssSelector("a.logout");
 
 	public HomePage(WebDriver driver) {
 		this.driver = driver;
@@ -75,7 +75,19 @@ public class HomePage {
 	}
 	
 	public void clicarBotaoSignOut() {
-		driver.findElement(botaosignOut).click();
+		driver.findElement(botaoSignOut).click();
+	}
+
+	public void carregarPaginaInicial() {
+		driver.get("https://marcelodebittencourt.com/demoprestashop/");
+	}
+	
+	public String obterTituloPagina() {
+		return driver.getTitle();
+	}
+
+	public boolean estaLogado() {
+		return !"Sign in".contentEquals(driver.findElement(usuarioLogado).getText());
 	}
 		
 }
