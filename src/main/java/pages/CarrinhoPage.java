@@ -11,9 +11,9 @@ public class CarrinhoPage {
 	
 	private By precoProduto = By.cssSelector("span.price");
 
-	private By tamanhoProduto = By.xpath("//div[contains(@class, 'product-line-grid-body')]//div[3]/span[contains(@class, 'value')]");
+	private By tamanhoProduto = By.xpath("//div[contains(@class,'product-line-grid-body')]//div[3]/span[contains(@class,'value')]");
 	
-	private By corProduto = By.xpath("//div[contains(@class, 'product-line-grid-body')]//div[4]/span[contains(@class, 'value')]");
+	private By corProduto = By.xpath("//div[contains(@class,'product-line-grid-body')]//div[4]/span[contains(@class,'value')]");
 
 	private By input_quantidadeProduto = By.cssSelector("input.js-cart-line-product-quantity");
 	

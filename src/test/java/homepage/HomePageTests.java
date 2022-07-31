@@ -2,18 +2,20 @@ package homepage;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvFileSource;
 
 import base.BaseTests;
 import pages.CarrinhoPage;
 import pages.CheckoutPage;
 import pages.LoginPage;
 import pages.ModalProdutoPage;
+import pages.PedidoPage;
 import pages.ProdutoPage;
 import util.Funcoes;
 
@@ -35,7 +37,8 @@ public class HomePageTests extends BaseTests {
 
 	ProdutoPage produtoPage;
 	String nomeProduto_ProdutoPage;
-
+	
+	
 	@Test
 	public void testValidarDetalhesDoProduto_DescricaoEValorIguais() {
 		int indice = 0;
@@ -76,6 +79,37 @@ public class HomePageTests extends BaseTests {
 
 		carregarPaginaInicial();
 	}
+	
+	@ParameterizedTest
+	@CsvFileSource(resources = "/massaTeste_Login.csv", numLinesToSkip = 1, delimiter = ';')
+	public void testLogin_UsuarioLogadoComDadosValidos(String nomeTeste, String email, 
+			String password, String nomeUsuario ,String resultado) {
+//		Clicar no botão de Sign In na home page
+		loginPage = homePage.clicarBotaoSignIn();
+
+//		Preencher usuario e senha
+		loginPage.preencherEmail(email);
+		loginPage.preencherPassword(password);
+
+//		Clicar no botão Sign In para logar
+		loginPage.clicarBotaoSignIn();
+		
+		boolean esperado_loginOK;
+		if(resultado.equals("positivo"))
+			esperado_loginOK = true;
+		else
+			esperado_loginOK = false;
+
+//		Validar se o usuario está logado de fato
+		assertThat(homePage.estaLogado(nomeUsuario), is(esperado_loginOK));
+		
+		capturarTela(nomeTeste, resultado);
+		
+		if(esperado_loginOK)
+			homePage.clicarBotaoSignOut();
+
+		carregarPaginaInicial();
+	}
 
 	ModalProdutoPage modalProdutoPage;
 
@@ -102,7 +136,7 @@ public class HomePageTests extends BaseTests {
 		System.out.println(listaOpcoes.get(0));
 		System.out.println("Tamanho da lista: " + listaOpcoes.size());
 
-		produtoPage.selecionarOpcaoDropDown("M");
+		produtoPage.selecionarOpcaoDropDown(tamanhoProduto);
 		
 		listaOpcoes = produtoPage.obterOpcoesSelecionadas();
 
@@ -113,7 +147,7 @@ public class HomePageTests extends BaseTests {
 		produtoPage.selecionarCorPreta();
 
 //		Selecionar quantidade
-		produtoPage.alterarQuantidade(quantidadeProduto);
+		produtoPage.alterarQuantidade(2);
 
 //		Adicionar no carrinho
 		modalProdutoPage = produtoPage.clicarBotaoAddToCart();
@@ -166,10 +200,11 @@ public class HomePageTests extends BaseTests {
 	Double esperado_totalTaxInclTotal = esperado_totalTaxExclTotal;
 	Double esperado_taxesTotal = 0.00;
 	
+	String esperado_nomeCliente = "Vanderson Oliveira";
+	
 	CarrinhoPage carrinhoPage;
-
 	@Test
-	public void testIrParaCarrinho_InformacoesPersistidas() {
+	public void IrParaCarrinho_InformacoesPersistidas() {
 		// --Pré-condições
 //		Produto incluído na tela ModalProdutoPage
 		testIncluirProdutoNoCarrinho_ProdutoIncluidoComSucesso();
@@ -238,10 +273,10 @@ public class HomePageTests extends BaseTests {
 	CheckoutPage checkoutPage;
 
 	@Test
-	public void testIrParaCheckout_FreteMeioPagamentoEntregaListadosOk() {
+	public void IrParaCheckout_FreteMeioPagamentoEnderecoListadosOk() {
 //			Pré-condições
 //			Produto disponível na tela ModalProdutoPage
-		testIrParaCarrinho_InformacoesPersistidas();
+		IrParaCarrinho_InformacoesPersistidas();
 //			Teste
 
 //			Clicar no botão
@@ -251,9 +286,55 @@ public class HomePageTests extends BaseTests {
 
 //			Validar Informações na tela
 		assertThat(Funcoes.removeCifraoDevolveDouble(checkoutPage.obter_totalTaxInclTotal()), is(esperado_totalTaxInclTotal));
-
-//			
-
+//		assertThat(checkoutPage.obter_nomeCliente(), is(esperado_nomeCliente));
+		assertTrue(checkoutPage.obter_nomeCliente().startsWith(esperado_nomeCliente));
+		
+		checkoutPage.clicarBotaoContinueAddress();
+		
+		String encontrado_shippingValor = checkoutPage.obter_shippingValor();
+		encontrado_shippingValor = Funcoes.removeTexto(encontrado_shippingValor, " tax excl.");
+		Double encontrado_shippingValor_Double = Funcoes.removeCifraoDevolveDouble(encontrado_shippingValor);
+		
+		assertThat(encontrado_shippingValor_Double, is(esperado_shippingTotal));
+		
+		checkoutPage.clicarBotaoContinueShipping();	
+		
+//		Selecionar opção "Pay by check"
+		checkoutPage.selecionarRadioPayByCheck();
+//		Validar valor do cheque (amount)
+		String encontrado_amountPayByCheck = checkoutPage.obter_amountPayByCheck();
+		encontrado_amountPayByCheck = Funcoes.removeTexto(encontrado_amountPayByCheck, " (tax incl.)");
+		Double encontrado_amountPayBycheck_Double = Funcoes.removeCifraoDevolveDouble(encontrado_amountPayByCheck);
+		
+		assertThat(encontrado_amountPayBycheck_Double, is(esperado_totalTaxInclTotal));
+//		Clicar na opção "I agree"
+		checkoutPage.selecionarCheckboxIAgree();
+		
+		assertTrue(checkoutPage.estaSelecionadoCheckBoxIAgree());
+	}
+	
+	@Test
+	public void finalizarPedido_pedidoFinalizadoComSucesso() {
+//		Pré-condições
+//		Checout completamente concluído
+		IrParaCheckout_FreteMeioPagamentoEnderecoListadosOk();
+//		Teste
+		
+//		Clicar no botão para confirmar o pedido
+		PedidoPage pedidoPage = checkoutPage.clicarBotaoConfirmaPedido();
+		
+		
+//		Validar valoes da tela
+		assertTrue(pedidoPage.obter_textoPedidoConfirmado().endsWith("YOUR ORDER IS CONFIRMED"));
+//		assertThat(pedidoPage.obter_textoPedidoConfirmado().toUpperCase(), is("YOUR ORDER IS CONFIRMED"));
+		
+		assertThat(pedidoPage.obter_email(),is("contachaves@test.com"));
+		
+		assertThat(pedidoPage.obter_totalProdutos(), is(esperado_subtotalProduto));
+		
+		assertThat(pedidoPage.obter_totalTaxIncl(), is(esperado_totalTaxInclTotal));
+		
+		assertThat(pedidoPage.obter_metodoPagamento(), is("check"));
 	}
 	
 }

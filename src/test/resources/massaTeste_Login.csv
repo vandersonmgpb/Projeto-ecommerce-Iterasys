@@ -1,0 +1,3 @@
+nomeTeste;email;password;nomeUsuario;resultado
+loginValido;contachaves@test.com;01234;Vanderson Oliveira;positivo
+loginInvalido;contachaves@test.com;teste123;Vanderson Oliveira;negativo
